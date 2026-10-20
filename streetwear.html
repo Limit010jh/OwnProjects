@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>استوديو الساحل – متجر الملابس العصرية</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8f5ef;
+      --surf: #ffffff;
+      --ink: #1e2022;
+      --mute: #71767b;
+      --acc: #b86232;
+      --line: #ede7de;
+      --glass: rgba(248, 245, 239, 0.85);
+      color-scheme: light;
+      box-sizing: border-box;
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #141618;
+        --surf: #1d2023;
+        --ink: #f3f4f6;
+        --mute: #9ca3af;
+        --line: #2d3135;
+        --glass: rgba(20, 22, 24, 0.85);
+        color-scheme: dark;
+      }
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Cairo', system-ui, sans-serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    .brand {
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .surf {
+      background: var(--surf);
+      border: 1px solid var(--line);
+    }
+
+    .mute {
+      color: var(--mute);
+    }
+
+    .btn {
+      background: var(--ink);
+      color: var(--bg);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn:hover {
+      background: var(--acc);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -10px rgba(184, 98, 50, 0.5);
+    }
+
+    .card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px -15px rgba(30, 32, 34, 0.12);
+      border-color: var(--acc);
+    }
+
+    .card img {
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card:hover img {
+      transform: scale(1.08);
+    }
+
+    .glass {
+      background: var(--glass);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+    }
+
+    #nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      z-index: 40;
+      border-bottom: 1px solid var(--line);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- شريط الملاحة العصري -->
+  <header id="nav" class="glass">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <a href="#top" class="brand text-2xl font-extrabold tracking-tight flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full inline-block" style="background: var(--acc);"></span>
+        استوديو الساحل
+      </a>
+      <nav class="hidden md:flex gap-10 text-sm font-semibold mute" aria-label="Main">
+        <a class="hover:text-[var(--acc)] transition-colors" href="#shop">المتجر الرئيسي</a>
+        <a class="hover:text-[var(--acc)] transition-colors" href="#story">قصة العلامة</a>
+      </nav>
+      <div class="flex items-center gap-3">
+        <!-- زر السلة المحدث -->
+        <button id="openCart"
+          class="p-3 rounded-2xl surf hover:border-[var(--acc)] transition-all relative flex items-center gap-2"
+          aria-label="Cart">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M5 8h14l-1 12H6L5 8Z" />
+            <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+          </svg>
+          <span class="text-xs font-bold hidden sm:inline">السلة</span>
+          <span id="count"
+            class="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] rounded-full text-xs leading-[22px] text-center text-white font-bold shadow-md"
+            style="background:var(--acc)">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- لوحة سلة الشراء الجانبية -->
+  <aside id="cartDrawer"
+    class="fixed top-0 left-0 bottom-0 z-50 w-96 max-w-[90%] p-6 -translate-x-full transition-transform duration-400 ease-out surf rounded-r-[2.5rem] flex flex-col shadow-2xl">
+    <div class="flex items-center justify-between pb-5 border-b border-[var(--line)]">
+      <h2 class="text-2xl font-extrabold brand">سلة الشراء</h2>
+      <button id="closeCart" class="p-2.5 rounded-full surf hover:bg-black/5 transition-colors"><svg width="22"
+          height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="m6 6 12 12M18 6 6 18" />
+        </svg></button>
+    </div>
+
+    <div id="cartItems" class="flex-1 overflow-y-auto my-5 flex flex-col gap-4">
+      <p class="mute text-center my-auto text-sm">سلة الشراء فارغة حالياً.</p>
+    </div>
+
+    <div class="pt-5 border-t border-[var(--line)]">
+      <div class="flex justify-between items-center mb-5 text-lg font-bold">
+        <span>المجموع الكلي:</span>
+        <span id="cartTotal" class="text-[var(--acc)]">0 درهم</span>
+      </div>
+      <button id="checkoutBtn" class="btn w-full rounded-2xl py-4 font-bold text-base text-center shadow-lg">الإتمام عبر
+        الواتساب</button>
+    </div>
+  </aside>
+
+  <!-- نافذة تفاصيل المنتج المنبثقة (Modal) -->
+  <div id="productModal"
+    class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
+    <div id="modalContent"
+      class="surf w-full max-w-3xl rounded-[2.5rem] p-6 md:p-8 transform scale-95 transition-transform duration-300 relative shadow-2xl flex flex-col md:flex-row gap-8 items-center">
+      <button onclick="closeProductModal()"
+        class="absolute top-5 left-5 p-2 rounded-full surf hover:bg-black/5 transition-colors z-10"><svg width="22"
+          height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="m6 6 12 12M18 6 6 18" />
+        </svg></button>
+
+      <div class="w-full md:w-1/2 aspect-square rounded-3xl overflow-hidden bg-[var(--bg)]">
+        <img id="modalImg" src="" alt="" class="w-full h-full object-cover">
+      </div>
+
+      <div class="w-full md:w-1/2 flex flex-col justify-between">
+        <div>
+          <span
+            class="text-xs font-bold px-3 py-1 rounded-full bg-[var(--acc)]/10 text-[var(--acc)] inline-block mb-3">متوفر
+            في المخزون</span>
+          <h2 id="modalTitle" class="text-2xl md:text-3xl font-extrabold mb-3"></h2>
+          <p id="modalPrice" class="text-2xl font-bold text-[var(--acc)] mb-4"></p>
+          <p class="text-sm mute leading-relaxed mb-6">قطعة مصممة بعناية فائقة من خامات عالية الجودة لتمنحك مظهراً
+            عصرياً، مريحاً، وملائماً لكل الأوقات والمناسبات اليومية.</p>
+        </div>
+        <button id="modalAddBtn" class="btn w-full rounded-2xl py-4 font-bold text-base shadow-lg">إضافة للسلة</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="scrim"
+    class="fixed inset-0 z-40 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-xs">
+  </div>
+
+  <main id="top" class="pt-32 pb-20">
+    <!-- عنوان عصري وبحث متطور -->
+    <section class="max-w-7xl mx-auto px-6 mb-12">
+      <div
+        class="surf rounded-[2.5rem] p-8 md:p-12 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+        <div>
+          <h1 class="text-3xl md:text-5xl font-extrabold mb-3 tracking-tight">تشكيلة الملابس العصرية</h1>
+          <p class="mute text-base">اكتشف أرقى تصاميم الـ Streetwear المصنوعة خصيصاً لذوقك الرفيع.</p>
+        </div>
+        <!-- صندوق البحث -->
+        <div class="w-full md:w-96">
+          <div class="relative">
+            <svg class="absolute right-4 top-3.5 mute" width="20" height="20" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" id="searchInput" placeholder="ابحث عما ترغب فيه (هودي، جاكيت، سروال...)"
+              class="w-full pr-12 pl-5 py-3.5 rounded-2xl surf outline-none focus:ring-2 focus:ring-[var(--acc)] text-sm font-medium transition-all shadow-inner">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- شبكة المنتجات العصرية -->
+    <section id="shop" class="max-w-7xl mx-auto px-6 mb-20">
+      <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6"></div>
+
+      <!-- أزرار التنقل بين الصفحات -->
+      <div id="pagination" class="flex justify-center items-center gap-2.5 mt-16"></div>
+    </section>
+
+    <!-- قسم قصة العلامة ومصادر الاستيراد العالمية -->
+    <section id="story" class="max-w-7xl mx-auto px-6">
+      <div class="surf rounded-[2.5rem] p-8 md:p-14 grid md:grid-cols-2 gap-10 items-center shadow-sm">
+        <div>
+          <span
+            class="text-xs font-bold px-3 py-1 rounded-full bg-[var(--acc)]/10 text-[var(--acc)] inline-block mb-4">قصتنا
+            ومصادرنا العالمية</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-6 leading-tight">من عواصم الموضة العالمية إلى باب منزلك.
+          </h2>
+          <p class="mute text-base leading-relaxed mb-4">
+            تأسست "استوديو الساحل" برؤية طموحة لتقديم أحدث صيحات ملابس الشارع (Streetwear) بمستوى عالمي. نحن لا نبيع
+            ملابس فحسب، بل نختار لك أسلوب حياة يعكس شخصيتك الفريدة.
+          </p>
+
+          <!-- تفاصيل الدول المستورد منها -->
+          <div class="mt-6 pt-6 border-t border-[var(--line)]">
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full inline-block" style="background: var(--acc);"></span>
+              مصادر استيراد السلع والخامات:
+            </h3>
+            <p class="mute text-base leading-relaxed mb-4">
+              نحرص على جلب أجود الخامات وأحدث التصاميم الحصرية عبر استيراد سلعنا مباشرة من أشهر أسواق وعواصم الموضة
+              العالمية:
+            </p>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="surf p-3 rounded-2xl text-center font-bold text-sm">🇪🇸 إسبانيا</div>
+              <div class="surf p-3 rounded-2xl text-center font-bold text-sm">🇫🇷 فرنسا</div>
+              <div class="surf p-3 rounded-2xl text-center font-bold text-sm">🇺🇸 أمريكا</div>
+              <div class="surf p-3 rounded-2xl text-center font-bold text-sm">🇮🇹 إيطاليا</div>
+            </div>
+          </div>
+        </div>
+        <div class="rounded-3xl overflow-hidden aspect-[4/3] bg-[var(--bg)] shadow-inner">
+          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&auto=format&fit=crop"
+            alt="قصة استوديو الساحل" class="w-full h-full object-cover">
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // قاعدة بيانات المخزون مع صورك الأصلية
+    const allProducts = [
+      { id: 1, n: 'هودي كلاسيكي', p: 429, img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQepJ1wkIpQ4h4rZ-cHcufxFEMiuXcog_VnEYJKAGBGiLKuO_f_Eaa9wqQ&s=10' },
+      { id: 2, n: 'تيشرت بولو زيتي', p: 189, img: 'https://cdn.salla.sa/EZZXyD/9C2uyz5dnbFYCUuCRIVHl7XoMwpxUuxzgdexrCIg.jpg' },
+      { id: 3, n: 'سروال كارجو بيج', p: 359, img: 'https://khotwh.com/cdn/shop/files/beige-cargo-pant-w-396813_1200x1200.jpg?v=1756335648' },
+      { id: 4, n: 'قبعة سوداء', p: 119, img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1NzodthfNp4gw7tbpk4kDxvSJHykj9HQ_CsKOZEqg1SBquU7AvV-zBiyb&s=10' },
+      { id: 5, n: 'جاكيت جلدي', p: 699, img: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&auto=format&fit=crop' },
+      { id: 6, n: 'قميص فلانلان مربعات', p: 299, img: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&auto=format&fit=crop' },
+      { id: 7, n: 'سروال جينز أزرق باهت', p: 380, img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQskp9XN3dHzYUJ01sXG1WH_XSX-CFKh4fzikkIgk4U6g&s' },
+      { id: 8, n: 'معطف صوفي طويل رمادي', p: 850, img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgGyQtPcHlW2Ce8DkHt_umVx8KuuE2kkaC3HDQu_iKUPKOHoNOxRKHktI&s=10' },
+      { id: 9, n: 'سترة واقية من الرياح', p: 490, img: 'https://www.okaidi.ma/3706365-medium_default/boy-s-green-waterproof-windcheater-jacket.jpg' },
+      { id: 10, n: 'تيشرت أبيض بتصميم مطبوع', p: 170, img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3dkphvcytkhW4KKwJ0GnMvU9U7EWGDmc4cymvEMH-JjS-anCEQYtcVRg&s=10' },
+      { id: 11, n: 'هودي بسحاب رمادي', p: 450, img: 'https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=800&auto=format&fit=crop' },
+      { id: 12, n: 'جاكيت بومبر عسكري', p: 580, img: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=800&auto=format&fit=crop' },
+      { id: 13, n: 'سروال رياضي أسود فخم', p: 260, img: 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&auto=format&fit=crop' },
+      { id: 14, n: 'سترة صوفية برقبة دائرية', p: 420, img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&auto=format&fit=crop' },
+      { id: 15, n: 'قبعة صوفية شتوية', p: 99, img: 'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=800&auto=format&fit=crop' },
+      { id: 16, n: 'قميص كتان أبيض صيفي', p: 310, img: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&auto=format&fit=crop' },
+      { id: 17, n: 'سروال تشينو كحلي', p: 340, img: 'https://images.unsplash.com/photo-1473966968600-fa809b869a1c?w=800&auto=format&fit=crop' },
+      { id: 18, n: 'جاكيت ديسكو لامع', p: 620, img: 'https://images.unsplash.com/photo-1544441893-675973e31985?w=800&auto=format&fit=crop' },
+      { id: 19, n: 'هودي أخضر زيتي', p: 430, img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop' },
+      { id: 20, n: 'تيشرت أسود مخطط', p: 195, img: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&auto=format&fit=crop' },
+      { id: 21, n: 'سروال قطني واسع (Baggy)', p: 390, img: 'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?w=800&auto=format&fit=crop' },
+      { id: 22, n: 'معطف قصير بني', p: 720, img: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=800&auto=format&fit=crop' },
+      { id: 23, n: 'جاكيت جينز ممزق', p: 480, img: 'https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?w=800&auto=format&fit=crop' },
+      { id: 24, n: 'هودي أزرق سماوي', p: 410, img: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&auto=format&fit=crop' },
+      { id: 25, n: 'تيشرت أحمر داكن', p: 180, img: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&auto=format&fit=crop' },
+      { id: 26, n: 'سروال رمادي رسمي', p: 360, img: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&auto=format&fit=crop' },
+      { id: 27, n: 'قبعة دائرية (Bucket Hat)', p: 130, img: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&auto=format&fit=crop' },
+      { id: 28, n: 'جاكيت صوف مقلّم', p: 510, img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&auto=format&fit=crop' },
+      { id: 29, n: 'هودي أصفر خردلي', p: 440, img: 'https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=800&auto=format&fit=crop' },
+      { id: 30, n: 'قميص جينز أزرق غامق', p: 330, img: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&auto=format&fit=crop' },
+      { id: 31, n: 'سروال كارجو أسود', p: 390, img: 'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?w=800&auto=format&fit=crop' },
+      { id: 32, n: 'معطف شتوي مبطن', p: 910, img: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&auto=format&fit=crop' },
+      { id: 33, n: 'سترة رياضية خفيفة', p: 410, img: 'https://images.unsplash.com/photo-1548883354-7622d03aca27?w=800&auto=format&fit=crop' },
+      { id: 34, n: 'سروال بني فاتح', p: 165, img: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?q=80&w=687&auto=format&fit=crop' },
+      { id: 35, n: 'هودي بنفسجي عصري', p: 460, img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop' },
+      { id: 36, n: 'جاكيت واقٍ طويل', p: 670, img: 'https://images.unsplash.com/photo-1544441893-675973e31985?w=800&auto=format&fit=crop' },
+      { id: 37, n: 'سروال قماشي واسع', p: 320, img: 'https://images.unsplash.com/photo-1473966968600-fa809b869a1c?w=800&auto=format&fit=crop' },
+      { id: 38, n: 'قبعة رياضية بيضاء', p: 110, img: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&auto=format&fit=crop' },
+      { id: 39, n: 'قميص صيفي مطبوع بأوراق', p: 280, img: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&auto=format&fit=crop' },
+      { id: 40, n: 'تيشرت بولو أبيض فاخر', p: 210, img: 'https://images.unsplash.com/photo-1625895191496-e986cfae4645?w=800&auto=format&fit=crop' },
+      { id: 41, n: 'هودي بني شوكولاتة', p: 430, img: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&auto=format&fit=crop' },
+      { id: 42, n: 'سروال جينز أسود ضيق', p: 370, img: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=800&auto=format&fit=crop' },
+      { id: 43, n: 'جاكيت جلد بني عتيق', p: 750, img: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&auto=format&fit=crop' },
+      { id: 44, n: 'معطف صوف أسود أنيق', p: 820, img: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&auto=format&fit=crop' },
+      { id: 45, n: 'سترة صوفية برقبة عالية', p: 490, img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&auto=format&fit=crop' },
+      { id: 46, n: 'تيشرت أخضر عسكري', p: 175, img: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&auto=format&fit=crop' },
+      { id: 47, n: 'سروال رياضي رمادي فاتح', p: 250, img: 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&auto=format&fit=crop' },
+      { id: 48, n: 'قبعة شتوية بنية', p: 99, img: 'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=800&auto=format&fit=crop' },
+      { id: 49, n: 'هودي أحمر قاني', p: 440, img: 'https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=800&auto=format&fit=crop' },
+      { id: 50, n: 'جاكيت بومبر أسود كلاسيكي', p: 560, img: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=800&auto=format&fit=crop' }
+    ];
+
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let cart = [];
+    let searchQuery = "";
+
+    function renderProducts() {
+      const grid = document.getElementById('grid');
+      const pagination = document.getElementById('pagination');
+
+      const filtered = allProducts.filter(p => p.n.toLowerCase().includes(searchQuery.toLowerCase()));
+      const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const paginatedItems = filtered.slice(start, start + itemsPerPage);
+
+      if (paginatedItems.length === 0) {
+        grid.innerHTML = `<p class="col-span-full text-center mute py-16 text-lg">لم يتم العثور على أي منتج يطابق بحثك.</p>`;
+        pagination.innerHTML = '';
+        return;
+      }
+
+      grid.innerHTML = paginatedItems.map(x => `
+        <article class="card surf rounded-[2rem] p-4 flex flex-col justify-between cursor-pointer group" onclick="openProductModal(${x.id})">
+          <div class="pic rounded-2xl overflow-hidden aspect-square bg-[var(--bg)] mb-4 relative">
+            <img src="${x.img}" alt="${x.n}" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <span class="bg-white/90 text-black text-xs font-bold px-3 py-1.5 rounded-full shadow-md">عرض التفاصيل</span>
+            </div>
+          </div>
+          <div class="px-1 pb-1">
+            <h3 class="font-bold text-base mb-1 truncate group-hover:text-[var(--acc)] transition-colors">${x.n}</h3>
+            <p class="font-bold text-sm text-[var(--acc)] mb-4">${x.p} درهم</p>
+            <button class="add btn w-full rounded-xl py-2.5 text-xs font-bold shadow-sm" onclick="event.stopPropagation(); addToCart(${x.id})">إضافة للسلة</button>
+          </div>
+        </article>
+      `).join('');
+
+      let pagesHtml = '';
+      if (totalPages > 1) {
+        pagesHtml += `<button onclick="changePage(${currentPage - 1})" class="px-5 py-2.5 rounded-2xl surf text-sm font-bold ${currentPage === 1 ? 'opacity-45 cursor-not-allowed' : 'hover:border-[var(--acc)]'}">السابق</button>`;
+
+        for (let i = 1; i <= totalPages; i++) {
+          pagesHtml += `<button onclick="changePage(${i})" class="w-11 h-11 rounded-2xl text-sm font-bold transition-all ${i === currentPage ? 'bg-[var(--acc)] text-white shadow-lg shadow-[var(--acc)]/30' : 'surf hover:border-[var(--acc)]'}">${i}</button>`;
+        }
+
+        pagesHtml += `<button onclick="changePage(${currentPage + 1})" class="px-5 py-2.5 rounded-2xl surf text-sm font-bold ${currentPage === totalPages ? 'opacity-45 cursor-not-allowed' : 'hover:border-[var(--acc)]'}">التالي</button>`;
+      }
+      pagination.innerHTML = pagesHtml;
+    }
+
+    function openProductModal(id) {
+      const product = allProducts.find(p => p.id === id);
+      if (!product) return;
+
+      document.getElementById('modalImg').src = product.img;
+      document.getElementById('modalTitle').textContent = product.n;
+      document.getElementById('modalPrice').textContent = product.p + ' درهم';
+
+      const addBtn = document.getElementById('modalAddBtn');
+      addBtn.onclick = () => {
+        addToCart(product.id);
+        closeProductModal();
+      };
+
+      const modal = document.getElementById('productModal');
+      const content = document.getElementById('modalContent');
+      modal.style.pointerEvents = 'auto';
+      modal.style.opacity = '1';
+      content.style.transform = 'scale(1)';
+    }
+
+    function closeProductModal() {
+      const modal = document.getElementById('productModal');
+      const content = document.getElementById('modalContent');
+      modal.style.opacity = '0';
+      modal.style.pointerEvents = 'none';
+      content.style.transform = 'scale(0.95)';
+    }
+
+    document.getElementById('productModal').onclick = (e) => {
+      if (e.target.id === 'productModal') closeProductModal();
+    };
+
+    function changePage(p) {
+      const filtered = allProducts.filter(item => item.n.toLowerCase().includes(searchQuery.toLowerCase()));
+      const totalPages = Math.ceil(filtered.length / itemsPerPage);
+      if (p >= 1 && p <= totalPages) {
+        currentPage = p;
+        renderProducts();
+        window.scrollTo({ top: 350, behavior: 'smooth' });
+      }
+    }
+
+    document.getElementById('searchInput').oninput = (e) => {
+      searchQuery = e.target.value.trim();
+      currentPage = 1;
+      renderProducts();
+    };
+
+    function addToCart(id) {
+      const item = allProducts.find(p => p.id === id);
+      const exist = cart.find(c => c.id === id);
+      if (exist) {
+        exist.qty += 1;
+      } else {
+        cart.push({ ...item, qty: 1 });
+      }
+      updateCart();
+      toggleCart(true);
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById('cartItems');
+      const count = document.getElementById('count');
+      const total = document.getElementById('cartTotal');
+
+      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+      const totalPrice = cart.reduce((sum, item) => sum + (item.p * item.qty), 0);
+
+      count.textContent = totalQty;
+      total.textContent = totalPrice + ' درهم';
+
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<p class="mute text-center my-auto text-sm">سلة الشراء فارغة حالياً.</p>';
+        return;
+      }
+
+      cartItems.innerHTML = cart.map(item => `
+        <div class="flex items-center gap-3 p-3 rounded-2xl surf border border-[var(--line)]">
+          <img src="${item.img}" class="w-16 h-16 object-cover rounded-xl" alt="${item.n}">
+          <div class="flex-1">
+            <h4 class="font-bold text-sm mb-0.5">${item.n}</h4>
+            <p class="text-xs mute">${item.p} درهم × ${item.qty}</p>
+          </div>
+          <button onclick="removeFromCart(${item.id})" class="p-2 text-red-500 font-bold hover:bg-red-500/10 rounded-xl transition-colors">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(item => item.id !== id);
+      updateCart();
+    }
+
+    const cartDrawer = document.getElementById('cartDrawer');
+    const scrim = document.getElementById('scrim');
+
+    function toggleCart(open) {
+      cartDrawer.style.transform = open ? 'translateX(0)' : '';
+      scrim.style.opacity = open ? 1 : 0;
+      scrim.style.pointerEvents = open ? 'auto' : 'none';
+    }
+
+    document.getElementById('openCart').onclick = () => toggleCart(true);
+    document.getElementById('closeCart').onclick = () => toggleCart(false);
+    scrim.onclick = () => {
+      toggleCart(false);
+      closeProductModal();
+    };
+
+    document.getElementById('checkoutBtn').onclick = () => {
+      if (cart.length === 0) return alert('سلة الشراء فارغة!');
+      let msg = 'هذا مجرد موقع لا يتبع لاي شركة فقط كواجهة\n\n';
+
+      window.open(`https://wa.me/212600000000?text=${encodeURIComponent(msg)}`, '_blank');
+    };
+
+    renderProducts();
+  </script>
+</body>
+
+</html>
